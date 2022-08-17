@@ -2,7 +2,7 @@
 $(".next-btn").click(function(){
     var divtag = pics1;
     var styletag = "background-image:url(digital-switch/1.jpg)";
-    for (i = 1 ; i <= 23 ; i++) {
+    for (i = 1 ; i <= 5 ; i++) {
         console.log(i)
         $("#pics"+i).attr("href", "digital-switch/"+i+".jpg")
         $("#pics"+i).attr("data-setbg", "digital-switch/"+i+".jpg")
