@@ -2,20 +2,23 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"rest-go/database"
 	"rest-go/entity"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // GetAllPicture get all picture data
 func GetAllPicture(w http.ResponseWriter, r *http.Request) {
 	var pictures []entity.Picture
+	// vars := mux.Vars(r)
+	// key := vars["type"]
+	pictype := r.URL.Query().Get("type")
 
-	db := database.Connector.Find(&pictures)
+	// db := database.Connector.Find(&pictures, entity.Picture{Type: key})
+	db := database.Connector.Find(&pictures, entity.Picture{Type: pictype})
 	errors := db.GetErrors()
 	if len(errors) > 0 {
 		for i := 0; i < len(errors); i++ {
@@ -24,9 +27,18 @@ func GetAllPicture(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, s, http.StatusBadRequest)
 		}
 	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(pictures)
+		//if strings.Compare(strings.ToLower(pictype), "digital") != 0 || strings.Compare(strings.ToLower(pictype), "film") != 0 {
+		//if (strings.ToLower(pictype) != "digital") || strings.ToLower(pictype) != "film" {
+		switch pictype {
+		case "film", "digital":
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(pictures)
+		default:
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, "Invalid Query Parameter", http.StatusBadRequest)
+			return
+		}
 	}
 }
 

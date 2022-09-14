@@ -23,6 +23,7 @@ func Connect(connectionString string) error {
 
 // Migrate create/updates database table
 func Migrate(table *entity.Picture) {
-	Connector.AutoMigrate(&table)
+	//Connector.AutoMigrate(&table)
+	Connector.CreateTable(&table)
 	log.Println("Table migrated")
 }
