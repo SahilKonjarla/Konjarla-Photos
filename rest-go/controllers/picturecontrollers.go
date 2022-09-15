@@ -13,12 +13,21 @@ import (
 // GetAllPicture get all picture data
 func GetAllPicture(w http.ResponseWriter, r *http.Request) {
 	var pictures []entity.Picture
-	// vars := mux.Vars(r)
-	// key := vars["type"]
+	pageSize := 23
 	pictype := r.URL.Query().Get("type")
+	page := r.URL.Query().Get("page")
+	haspictype := r.Form["type"]
+	haspage := r.Form["page"]
+
+	pageInt, err := strconv.Atoi(page)
+	if err != nil && len(haspage) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, "Invalid Page Number", http.StatusBadRequest)
+	}
+	pageInt = (pageInt - 1) * pageSize
 
 	// db := database.Connector.Find(&pictures, entity.Picture{Type: key})
-	db := database.Connector.Find(&pictures, entity.Picture{Type: pictype})
+	db := database.Connector.Offset(pageInt).Limit(23).Find(&pictures, entity.Picture{Type: pictype})
 	errors := db.GetErrors()
 	if len(errors) > 0 {
 		for i := 0; i < len(errors); i++ {
@@ -27,18 +36,20 @@ func GetAllPicture(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, s, http.StatusBadRequest)
 		}
 	} else {
-		//if strings.Compare(strings.ToLower(pictype), "digital") != 0 || strings.Compare(strings.ToLower(pictype), "film") != 0 {
-		//if (strings.ToLower(pictype) != "digital") || strings.ToLower(pictype) != "film" {
-		switch pictype {
-		case "film", "digital":
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(pictures)
-		default:
-			w.Header().Set("Content-Type", "application/json")
-			http.Error(w, "Invalid Query Parameter", http.StatusBadRequest)
-			return
+		if len(haspictype) > 0 {
+			switch pictype {
+			case "film", "digital":
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(pictures)
+			default:
+				w.Header().Set("Content-Type", "application/json")
+				http.Error(w, "Invalid Query Parameter", http.StatusBadRequest)
+			}
 		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(pictures)
 	}
 }
 
