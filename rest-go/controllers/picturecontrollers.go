@@ -10,8 +10,16 @@ import (
 	"strconv"
 )
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "http://localhost:8090")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type")
+}
+
 // GetAllPicture get all picture data
 func GetAllPicture(w http.ResponseWriter, r *http.Request) {
+	//enableCors(&w)
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8090")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	var pictures []entity.Picture
 	pageSize := 23
 	pictype := r.URL.Query().Get("type")
@@ -55,6 +63,7 @@ func GetAllPicture(w http.ResponseWriter, r *http.Request) {
 
 // GetPictureID returns picture with specific ID
 func GetPictureID(w http.ResponseWriter, r *http.Request) {
+	//enableCors(&w)
 	vars := mux.Vars(r)
 	key := vars["id"]
 
@@ -75,6 +84,7 @@ func GetPictureID(w http.ResponseWriter, r *http.Request) {
 
 // CreatePicture creates picture
 func CreatePicture(w http.ResponseWriter, r *http.Request) {
+	//enableCors(&w)
 	requestBody, _ := ioutil.ReadAll(r.Body)
 	var picture entity.Picture
 	json.Unmarshal(requestBody, &picture)
@@ -96,6 +106,7 @@ func CreatePicture(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePictureByID updates picture with respective ID
 func UpdatePictureByID(w http.ResponseWriter, r *http.Request) {
+	//enableCors(&w)
 	requestBody, _ := ioutil.ReadAll(r.Body)
 	var picture entity.Picture
 	json.Unmarshal(requestBody, &picture)
@@ -117,6 +128,7 @@ func UpdatePictureByID(w http.ResponseWriter, r *http.Request) {
 
 // DeletePictureByID deletes picture with specific ID
 func DeletePictureByID(w http.ResponseWriter, r *http.Request) {
+	//enableCors(&w)
 	vars := mux.Vars(r)
 	key := vars["id"]
 	var picture entity.Picture
